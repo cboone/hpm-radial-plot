@@ -207,11 +207,13 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
       points(xpos, ypos, pch = point.symbols[i], col = point.color[i], ...)
     }
     
+    # Plot the centroid, if need be.
+    # 
     if (show.centroid) {
       if (match("p", plot.types, 0)) {
         nvertices <- length(xpos)
         
-        # first get the "last to first" area component
+        # First get the "last to first" area component.
         # 
         polygonarea <- (xpos[nvertices] * ypos[1]) - (xpos[1] * ypos[nvertices])
         for (vertex in 1:(nvertices - 1)) {
@@ -226,7 +228,6 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
         }
         points(centroidx / (6 * polygonarea), centroidy / (6 * polygonarea), col = point.color[i], pch = point.symbols[i], cex = 2, ...)
       } else {
-        # points(mean(xpos), mean(ypos), col = pointcol, pch = pointsymbols, cex = 2, ...)
         points(mean(xpos), mean(ypos), col = point.color[i], pch = point.symbols[i], cex = 2, ...)
       }
     }
