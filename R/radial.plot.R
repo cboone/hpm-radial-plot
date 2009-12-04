@@ -168,6 +168,37 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     lwd <- rep(lwd, length.out = data.set.count)
   }
   
+  # If no labels have been provided, generate them based on the data.
+  # 
+  if (is.na(labels[1])) {
+    label.angles <- seq(0, (2 * pi) - ((2 * pi) / 10), length.out = 9)
+    labels <- as.character(round(label.angles, 2))
+  }
+  
+  # If no label angles have been provided, generate them based on the data.
+  # 
+  if (is.null(label.angles[1])) {
+    label.length <- length(labels)
+    label.angles <- seq(0, (2 * pi) - ((2 * pi) / label.length), length.out = label.length)
+  }
+  
+  if (clockwise) {
+    label.angles <- -label.angles
+  }
+  if(start) {
+    label.angles <- label.angles + start
+  }
+  
+  # Get the vectors of the x and y positions of the radial grid lines.
+  # 
+  radial.grid.x <- cos(label.angles) * grid.max
+  radial.grid.y <- sin(label.angles) * grid.max
+  
+  if (show.radial.grid) {
+    segments(0, 0, radial.grid.x, radial.grid.y, col = grid.color)
+  }
+  
+  
   # Plot the data.
   # 
   for (i in 1:data.set.count) {
@@ -236,36 +267,6 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
         points(mean(data.x), mean(data.y), col = point.color[i], pch = point.symbols[i], cex = 2, ...)
       }
     }
-  }
-  
-  # If no labels have been provided, generate them based on the data.
-  # 
-  if (is.na(labels[1])) {
-    label.angles <- seq(0, (2 * pi) - ((2 * pi) / 10), length.out = 9)
-    labels <- as.character(round(label.angles, 2))
-  }
-  
-  # If no label angles have been provided, generate them based on the data.
-  # 
-  if (is.null(label.angles[1])) {
-    label.length <- length(labels)
-    label.angles <- seq(0, (2 * pi) - ((2 * pi) / label.length), length.out = label.length)
-  }
-  
-  if (clockwise) {
-    label.angles <- -label.angles
-  }
-  if(start) {
-    label.angles <- label.angles + start
-  }
-  
-  # Get the vectors of the x and y positions of the radial grid lines.
-  # 
-  radial.grid.x <- cos(label.angles) * grid.max
-  radial.grid.y <- sin(label.angles) * grid.max
-  
-  if (show.radial.grid) {
-    segments(0, 0, radial.grid.x, radial.grid.y, col = grid.color)
   }
   
   # Get the vectors of the x and y positions of the labels.
