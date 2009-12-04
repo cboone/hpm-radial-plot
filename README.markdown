@@ -7,7 +7,6 @@ Experimental radial plotting, in R. Based on [the plotrix package, by Jim Lemon,
 
 ## Changes from the original. ##
 
-
 - A more exact range can be used.
 
 
