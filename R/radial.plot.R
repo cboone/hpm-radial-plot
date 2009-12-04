@@ -70,10 +70,9 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   # 
   # data.values[data.values < 0] <- NA
   
+  # If no angles were provided, generate them based on the data.
+  # 
   if (is.null(data.angles[1])) {
-    # 
-    # If no angles were provided, generate them based on the data.
-    # 
     data.angles <- seq(0, (2 * pi) - ((2 * pi) / (data.length + 1)), length.out = data.length)
   }
    
@@ -167,6 +166,8 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     lwd <- rep(lwd, length.out = data.set.count)
   }
   
+  # Plot the data.
+  # 
   for (i in 1:data.set.count) {
     # 
     # Split up plot.type if there is a combination of displays.
@@ -233,10 +234,15 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     }
   }
   
+  # If no labels have been provided, generate them based on the data.
+  # 
   if (is.na(labels[1])) {
-    label.angles <- seq(0, 1.8 * pi, length = 9)
+    label.angles <- seq(0, (2 * pi) - ((2 * pi) / 10), length.out = 9)
     labels <- as.character(round(label.angles, 2))
   }
+  
+  # If no label angles have been provided, generate them based on the data.
+  # 
   if (is.null(label.angles[1])) {
     lablen <- length(labels)
     label.angles <- seq(0, pi * (2 - (2 / lablen)), length.out = lablen)
