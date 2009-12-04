@@ -33,7 +33,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             margins = c(2,2,3,2),
                             start = (pi / 2), clockwise = TRUE,
                             range = NULL, exact.range = TRUE,
-                            labels = NA, label.angles = NULL, horizontal.labels = FALSE, label.position = 1.1,
+                            labels = NA, label.angles = NULL, horizontal.labels = FALSE, label.shift = 1.1,
                             line.color = par("fg"), lty = par("lty"), lwd = par("lwd"),
                             show.grid = TRUE, show.grid.labels = TRUE, grid.unit = NULL,
                             show.radial.grid = TRUE, radial.labels = NULL,
@@ -114,7 +114,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     }
     
     grid.max <- max(grid.range - range[1])
-    grid.angles <- seq(0, ((2 * pi) * (49 / 50)), by = ((2 * pi) / 50))
+    grid.angles <- seq(0, (2 * pi) * (49 / 50), by = (2 * pi) / 50)
   } else {
     grid.range <- NA
     grid.max <- diff(range)
@@ -132,9 +132,9 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   
   if (show.grid) {
     for (i in 1:length(grid.range)) {
-      xpos <- cos(grid.angles) * (grid.range[i] - range[1])
-      ypos <- sin(grid.angles) * (grid.range[i] - range[1])
-      polygon(xpos, ypos, border = grid.color, col = grid.background)
+      grid.x <- cos(grid.angles) * (grid.range[i] - range[1])
+      grid.y <- sin(grid.angles) * (grid.range[i] - range[1])
+      polygon(grid.x, grid.y, border = grid.color, col = grid.background)
     }
   }
   
@@ -187,49 +187,51 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     
     # Get the vectors of the x and y positions.
     # 
-    xpos <- cos(data.angles[i,]) * data.values[i,]
-    ypos <- sin(data.angles[i,]) * data.values[i,]
+    data.x <- cos(data.angles[i,]) * data.values[i,]
+    data.y <- sin(data.angles[i,]) * data.values[i,]
     
     # Plot radial lines if plot.type includes "r".
     # 
     if (match("r", plot.types, 0)) {
-      segments(0, 0, xpos, ypos, col = line.color[i], lty = lty[i], lwd = lwd[i],...)
+      segments(0, 0, data.x, data.y, col = line.color[i], lty = lty[i], lwd = lwd[i],...)
     }
     
     # Plot a polygon if plot.type includes "p".
     # 
     if (match("p", plot.types, 0)) {
-      polygon(xpos, ypos, border = line.color[i], col = polygon.color[i], lty = lty[i], lwd = lwd[i], ...)
+      polygon(data.x, data.y, border = line.color[i], col = polygon.color[i], lty = lty[i], lwd = lwd[i], ...)
     }
     
     # Plot symbol points if plot.type includes "s".
     # 
     if (match("s", plot.types, 0)) {
-      points(xpos, ypos, pch = point.symbols[i], col = point.color[i], ...)
+      points(data.x, data.y, pch = point.symbols[i], col = point.color[i], ...)
     }
     
     # Plot the centroid, if need be.
     # 
     if (show.centroid) {
       if (match("p", plot.types, 0)) {
-        nvertices <- length(xpos)
+        nvertices <- length(data.x)
         
         # First get the "last to first" area component.
         # 
-        polygonarea <- (xpos[nvertices] * ypos[1]) - (xpos[1] * ypos[nvertices])
+        polygonarea <- (data.x[nvertices] * data.y[1]) - (data.x[1] * data.y[nvertices])
+        
         for (vertex in 1:(nvertices - 1)) {
-          polygonarea <- polygonarea + (xpos[vertex] * ypos[vertex + 1]) - (xpos[vertex + 1] * ypos[vertex])
+          polygonarea <- polygonarea + (data.x[vertex] * data.y[vertex + 1]) - (data.x[vertex + 1] * data.y[vertex])
         }
         polygonarea <- polygonarea / 2
-        centroidx <- (xpos[nvertices] + xpos[1]) * ((xpos[nvertices] * ypos[1]) - (xpos[1] * ypos[nvertices]))
-        centroidy <- (ypos[nvertices] + ypos[1]) * ((xpos[nvertices] * ypos[1]) - (xpos[1] * ypos[nvertices]))
+        centroidx <- (data.x[nvertices] + data.x[1]) * ((data.x[nvertices] * data.y[1]) - (data.x[1] * data.y[nvertices]))
+        centroidy <- (data.y[nvertices] + data.y[1]) * ((data.x[nvertices] * data.y[1]) - (data.x[1] * data.y[nvertices]))
+        
         for (vertex in 1:(nvertices - 1)) {
-          centroidx <- centroidx + (xpos[vertex] + xpos[vertex + 1]) * ((xpos[vertex] * ypos[vertex + 1]) - (xpos[vertex + 1] * ypos[vertex]))
-          centroidy <- centroidy + (ypos[vertex] + ypos[vertex + 1]) * ((xpos[vertex] * ypos[vertex + 1]) - (xpos[vertex + 1] * ypos[vertex]))
+          centroidx <- centroidx + (data.x[vertex] + data.x[vertex + 1]) * ((data.x[vertex] * data.y[vertex + 1]) - (data.x[vertex + 1] * data.y[vertex]))
+          centroidy <- centroidy + (data.y[vertex] + data.y[vertex + 1]) * ((data.x[vertex] * data.y[vertex + 1]) - (data.x[vertex + 1] * data.y[vertex]))
         }
         points(centroidx / (6 * polygonarea), centroidy / (6 * polygonarea), col = point.color[i], pch = point.symbols[i], cex = 2, ...)
       } else {
-        points(mean(xpos), mean(ypos), col = point.color[i], pch = point.symbols[i], cex = 2, ...)
+        points(mean(data.x), mean(data.y), col = point.color[i], pch = point.symbols[i], cex = 2, ...)
       }
     }
   }
@@ -244,9 +246,10 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   # If no label angles have been provided, generate them based on the data.
   # 
   if (is.null(label.angles[1])) {
-    lablen <- length(labels)
-    label.angles <- seq(0, pi * (2 - (2 / lablen)), length.out = lablen)
+    label.length <- length(labels)
+    label.angles <- seq(0, (2 * pi) - ((2 * pi) / label.length), length.out = label.length)
   }
+  
   if (clockwise) {
     label.angles <- -label.angles
   }
@@ -254,21 +257,27 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     label.angles <- label.angles + start
   }
   
-  xpos <- cos(label.angles) * grid.max
-  ypos <- sin(label.angles) * grid.max
+  # Get the vectors of the x and y positions of the radial grid lines.
+  # 
+  radial.grid.x <- cos(label.angles) * grid.max
+  radial.grid.y <- sin(label.angles) * grid.max
+  
   if (show.radial.grid) {
-    segments(0, 0, xpos, ypos, col = grid.color)
+    segments(0, 0, radial.grid.x, radial.grid.y, col = grid.color)
   }
   
-  xpos <- cos(label.angles) * grid.max * label.position
-  ypos <- sin(label.angles) * grid.max * label.position
+  # Get the vectors of the x and y positions of the labels.
+  # 
+  label.x <- cos(label.angles) * grid.max * label.shift
+  label.y <- sin(label.angles) * grid.max * label.shift
+  
   if (!horizontal.labels) {
     for(label in 1:length(labels)) {
-      labelsrt <- ((180 * label.angles[label]) / pi) + 180 * (label.angles[label] > (pi / 2) && label.angles[label] < (3 * pi / 2))
-      text(xpos[label], ypos[label], labels[label], cex = par("cex.axis"), srt = labelsrt)
+      label.rotation <- ((180 * label.angles[label]) / pi) + (180 * (label.angles[label] > (pi / 2) && label.angles[label] < (3 * pi / 2)))
+      text(label.x[label], label.y[label], labels[label], cex = par("cex.axis"), srt = label.rotation)
     }
   } else {
-    boxed.labels(xpos, ypos, labels, ypad = 0.7, border = FALSE, cex = par("cex.axis"))
+    text(label.x, label.y, labels, cex = par("cex.axis"))
   }
   
   if (show.grid.labels) {
