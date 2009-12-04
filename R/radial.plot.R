@@ -1,6 +1,6 @@
 # Special defaults for plotting sun data. More data, less ink.
 # 
-hpm.sun.plot <- function(data.values, data.angles = NULL,
+hpm.radial.sun.plot <- function(data.values, data.angles = NULL,
                          margins = c(7, 7.75, 8, 7.25),
                          start = ((pi / 2) - (pi / 6)),
                          range = 0:1,
@@ -17,7 +17,6 @@ hpm.sun.plot <- function(data.values, data.angles = NULL,
                   show.grid = show.grid, show.radial.grid = show.radial.grid,
                   show.range.labels = show.range.labels, ...)
 }
-
 
 # TODO:
 # - Straighten out the grid displaying situation.
