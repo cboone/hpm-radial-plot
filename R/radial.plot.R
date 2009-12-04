@@ -28,6 +28,8 @@ boxed.labels<-function(x,y=NA,labels,
 }
 
 
+# TODO: Straighten out the grid displaying situation. Allow for printing range labels other than horizontally.
+# 
 hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             main = "", xlab = "", ylab = "",
                             margins = c(2,2,3,2),
@@ -35,8 +37,8 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             range = NULL, exact.range = TRUE,
                             labels = NA, label.angles = NULL, horizontal.labels = FALSE, label.shift = 1.1,
                             line.color = par("fg"), lty = par("lty"), lwd = par("lwd"),
-                            show.grid = TRUE, show.grid.labels = TRUE, grid.unit = NULL,
-                            show.radial.grid = TRUE, radial.labels = NULL,
+                            show.grid = TRUE, show.range.labels = TRUE, grid.unit = NULL,
+                            show.radial.grid = TRUE, range.labels = NULL,
                             grid.color= gray(0.9), grid.background = "transparent",
                             point.symbols = NULL, point.color = NULL,
                             show.centroid = FALSE,
@@ -271,26 +273,36 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   label.x <- cos(label.angles) * grid.max * label.shift
   label.y <- sin(label.angles) * grid.max * label.shift
   
-  if (!horizontal.labels) {
-    for(label in 1:length(labels)) {
-      label.rotation <- ((180 * label.angles[label]) / pi) + (180 * (label.angles[label] > (pi / 2) && label.angles[label] < (3 * pi / 2)))
-      text(label.x[label], label.y[label], labels[label], cex = par("cex.axis"), srt = label.rotation)
+  # Print the grid labels.
+  # 
+  if (labels[1] != "") {
+    if (!horizontal.labels) {
+      for(label in 1:length(labels)) {
+        label.rotation <- ((180 * label.angles[label]) / pi) + (180 * (label.angles[label] > (pi / 2) && label.angles[label] < (3 * pi / 2)))
+        text(label.x[label], label.y[label], labels[label], cex = par("cex.axis"), srt = label.rotation)
+      }
+    } else {
+      text(label.x, label.y, labels, cex = par("cex.axis"))
     }
-  } else {
-    text(label.x, label.y, labels, cex = par("cex.axis"))
   }
   
-  if (show.grid.labels) {
-    ypos <- rep(-grid.max / 15, length(grid.range))
-    if (is.null(radial.labels)) {
-      radial.labels = as.character(grid.range)
+  # Print the radial grid labels.
+  # 
+  if (show.range.labels) {
+    range.labels.y <- rep(-grid.max / 15, length(grid.range))
+    
+    if (is.null(range.labels)) {
+      range.labels = as.character(grid.range)
     }
-    boxed.labels(grid.range - range[1], ypos, radial.labels, border = FALSE, cex = par("cex.lab"))
+    
+    text(grid.range - range[1], range.labels.y, range.labels, cex = par("cex.lab"))
   }
   
   if (!is.null(grid.unit)) {
     text(grid.max * 1.05, ypos, grid.unit, adj = 0)
   }
   
+  # Not much to restore, currently.
+  # 
   # par(oldpar)
 }
