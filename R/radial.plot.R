@@ -19,11 +19,14 @@ hpm.sun.plot <- function(data.values, data.angles = NULL,
 }
 
 
-# TODO: Straighten out the grid displaying situation. Allow for printing range labels other than horizontally.
+# TODO:
+# - Straighten out the grid displaying situation.
+# - Allow for printing range labels other than horizontally.
+# - Deal better with margins.
 # 
 hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             main = "", xlab = "", ylab = "",
-                            margins = c(2,2,3,2),
+                            margins = c(2, 2, 3, 2),
                             start = (pi / 2), clockwise = TRUE,
                             range = NULL, exact.range = TRUE,
                             labels = NA, label.angles = NULL, horizontal.labels = FALSE, label.shift = 1.1,
@@ -113,12 +116,10 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     grid.max <- diff(range)
   }
   
-  # The plot needs to be square, but let's leave the margins alone.
+  # The plot needs to be square, and let's not clip..
   # 
-  # oldpar <- par("xpd", "mar", "pty")
   oldpar <- par(no.readonly = TRUE)
-  # par(mar = margins, pty = "s")
-  par(pty = "s")
+  par(mar = margins, pty = "s", xpd = TRUE)
   
   # Set up the plotting area.
   # 
@@ -295,5 +296,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     text(grid.max * 1.05, ypos, grid.unit, adj = 0)
   }
   
+  # Restore the old settings.
+  # 
   par(oldpar)
 }
