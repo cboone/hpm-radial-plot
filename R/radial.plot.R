@@ -284,5 +284,3 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   
   # par(oldpar)
 }
-
-hpm.radial.plot(1:365)
