@@ -1,3 +1,24 @@
+# Special defaults for plotting sun data. More data, less ink.
+# 
+hpm.sun.plot <- function(data.values, data.angles = NULL,
+                         margins = c(7, 7.75, 8, 7.25),
+                         start = ((pi / 2) - (pi / 6)),
+                         range = 0:1,
+                         labels = "",
+                         line.color = gray(0.9), lwd = 4,
+                         show.grid = FALSE, show.radial.grid = FALSE,
+                         show.range.labels = FALSE, ...) {
+  hpm.radial.plot(data.values, data.angles,
+                  margins = margins,
+                  start = start,
+                  range = range,
+                  labels = labels,
+                  line.color = line.color, lwd = lwd,
+                  show.grid = show.grid, show.radial.grid = show.radial.grid,
+                  show.range.labels = show.range.labels, ...)
+}
+
+
 # TODO: Straighten out the grid displaying situation. Allow for printing range labels other than horizontally.
 # 
 hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
@@ -7,8 +28,8 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             range = NULL, exact.range = TRUE,
                             labels = NA, label.angles = NULL, horizontal.labels = FALSE, label.shift = 1.1,
                             line.color = par("fg"), lty = par("lty"), lwd = par("lwd"),
-                            show.grid = TRUE, show.range.labels = TRUE, grid.unit = NULL,
-                            show.radial.grid = TRUE, range.labels = NULL,
+                            show.grid = TRUE, show.radial.grid = TRUE, grid.unit = NULL,
+                            show.range.labels = TRUE, range.labels = NULL,
                             grid.color= gray(0.9), grid.background = "transparent",
                             point.symbols = NULL, point.color = NULL,
                             show.centroid = FALSE,
@@ -95,6 +116,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   # The plot needs to be square, but let's leave the margins alone.
   # 
   # oldpar <- par("xpd", "mar", "pty")
+  oldpar <- par(no.readonly = TRUE)
   # par(mar = margins, pty = "s")
   par(pty = "s")
   
@@ -273,7 +295,5 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     text(grid.max * 1.05, ypos, grid.unit, adj = 0)
   }
   
-  # Not much to restore, currently.
-  # 
-  # par(oldpar)
+  par(oldpar)
 }
