@@ -70,10 +70,8 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   if (is.null(data.angles[1])) {
     # 
     # If no angles were provided, generate them based on the data.
-    # But why 2 / data.length?
     # 
-    data.angles <- seq(0, (2 * pi) - (2 / data.length), length.out = data.length)
-    # data.angles <- seq(0, (2 * pi) - (1 / data.length), length.out = data.length)
+    data.angles <- seq(0, (2 * pi) - ((2 * pi) / (data.length + 1)), length.out = data.length)
   }
    
   data.angles.dimensions <- dim(data.angles)
@@ -113,10 +111,9 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
       }
     }
     
-    # Why shift the grid maximum?
+    # Why shift the grid maximum? Hmm. Seems to work though.
     # 
-    # grid.max <- max(grid.range - range[1])
-    grid.max <- max(grid.range)
+    grid.max <- max(grid.range - range[1])
     # grid.angles <- seq(0, (1.96 * pi), by = (0.04 * pi))
     grid.angles <- seq(0, ((2 * pi) * (49 / 50)), by = ((2 * pi) / 50))
   } else {
