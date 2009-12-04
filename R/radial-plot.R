@@ -28,7 +28,7 @@ boxed.labels<-function(x,y=NA,labels,
 }
 
 
-new.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
+hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             main = "", xlab = "", ylab = "",
                             margins = c(2,2,3,2),
                             start = (pi / 2), clockwise = TRUE,
@@ -285,4 +285,4 @@ new.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   # par(oldpar)
 }
 
-new.radial.plot(1:365)
+hpm.radial.plot(1:365)
