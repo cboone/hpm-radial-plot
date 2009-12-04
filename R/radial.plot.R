@@ -62,9 +62,12 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     data.values <- as.matrix(data.values)
   }
   
-  # Why remove the lowest value? Why coerce to positive values?
+  # Shift toward zero.
   # 
-  # data.values <- data.values - range[1]
+  data.values <- data.values - range[1]
+  
+  # Why coerce to positive values?
+  # 
   # data.values[data.values < 0] <- NA
   
   if (is.null(data.angles[1])) {
