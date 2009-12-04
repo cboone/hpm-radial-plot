@@ -40,7 +40,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             grid.color= gray(0.9), grid.background = "transparent",
                             point.symbols = NULL, point.color = NULL,
                             show.centroid = FALSE,
-                            poly.color = NULL, ...) {
+                            polygon.color = NULL, ...) {
  
   if (is.null(range)) {
     range <- range(data.values)
@@ -114,32 +114,36 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
       }
     }
     
-    # Why shift the grid maximum? Hmm. Seems to work though.
-    # 
     grid.max <- max(grid.range - range[1])
-    # grid.angles <- seq(0, (1.96 * pi), by = (0.04 * pi))
     grid.angles <- seq(0, ((2 * pi) * (49 / 50)), by = ((2 * pi) / 50))
   } else {
     grid.range <- NA
     grid.max <- diff(range)
   }
   
+  # The plot needs to be square, but let's leave the margins alone.
+  # 
   # oldpar <- par("xpd", "mar", "pty")
   # par(mar = margins, pty = "s")
   par(pty = "s")
   
+  # Set up the plotting area.
+  # 
   plot(c(-grid.max, grid.max), c(-grid.max, grid.max), type = "n", axes = FALSE, main = main, xlab = xlab, ylab = ylab)
   
   if (show.grid) {
-    for (i in seq(length(grid.range), 1, by = -1)) {
+    for (i in 1:length(grid.range)) {
       xpos <- cos(grid.angles) * (grid.range[i] - range[1])
       ypos <- sin(grid.angles) * (grid.range[i] - range[1])
       polygon(xpos, ypos, border = grid.color, col = grid.background)
     }
   }
+  
+  # Let's deal with clipping elsewhere.
+  # 
   # par(xpd=TRUE)
   
-  # Make sure that plot attributes are as detailed as need be.
+  # Make sure that plot attributes are as comprehensive as need be.
   # 
   if (length(line.color) < data.set.count) {
     line.color <- 1:data.set.count
@@ -153,8 +157,8 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   if (length(point.color) < data.set.count) {
     point.color <- rep(point.color, length.out = data.set.count)
   }
-  if (length(poly.color) < data.set.count) {
-    poly.color <- rep(poly.color, length.out = data.set.count)
+  if (length(polygon.color) < data.set.count) {
+    polygon.color <- rep(polygon.color, length.out = data.set.count)
   }
   if (length(lty) < data.set.count) {
     lty <- rep(lty, length.out = data.set.count)
@@ -164,58 +168,47 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   }
   
   for (i in 1:data.set.count) {
-    if (data.set.count > 1) {
-      linecol <- line.color[i]
-      polycol <- poly.color[i]
-      pointcol <- point.color[i]
-      pointsymbols <- point.symbols[i]
-      ltype <- lty[i]
-      lwidth <- lwd[i]
-    } else {
-      linecol <- line.color
-      polycol <- poly.color
-      pointcol <- point.color
-      pointsymbols <- point.symbols
-      ltype <- lty
-      lwidth <- lwd
-    }
-    
-    # split up plot.type if there is a combination of displays
     # 
-    rptype <- unlist(strsplit(plot.type[i], ""))
-    if (match("s", rptype, 0)) {
-      if (is.null(pointsymbols)) {
-        pointsymbols <- i
+    # Split up plot.type if there is a combination of displays.
+    # 
+    plot.types <- unlist(strsplit(plot.type[i], ""))
+    
+    # Set up the symbols, if they aren't provided.
+    # 
+    if (match("s", plot.types, 0)) {
+      if (is.null(point.symbols[i])) {
+        point.symbols[i] <- i
       }
-      if (is.null(pointcol)) {
-        pointcol <- i
+      if (is.null(point.color[i])) {
+        point.color[i] <- i
       }
     }
     
-    # get the vector of x positions
+    # Get the vectors of the x and y positions.
     # 
     xpos <- cos(data.angles[i,]) * data.values[i,]
-    
-    # get the vector of y positions
-    # 
     ypos <- sin(data.angles[i,]) * data.values[i,]
     
-    # plot radial lines if plot.type == "r"    
+    # Plot radial lines if plot.type includes "r".
     # 
-    if (match("r", rptype, 0)) {
-      segments(0, 0, xpos, ypos, col = linecol, lty = ltype, lwd = lwidth,...)
+    if (match("r", plot.types, 0)) {
+      segments(0, 0, xpos, ypos, col = line.color[i], lty = lty[i], lwd = lwd[i],...)
     }
     
-    if (match("p", rptype, 0)) {
-      polygon(xpos, ypos, border = linecol, col = polycol, lty = ltype, lwd = lwidth, ...)
+    # Plot a polygon if plot.type includes "p".
+    # 
+    if (match("p", plot.types, 0)) {
+      polygon(xpos, ypos, border = line.color[i], col = polygon.color[i], lty = lty[i], lwd = lwd[i], ...)
     }
     
-    if (match("s", rptype, 0)) {
-      points(xpos, ypos, pch = pointsymbols, col = pointcol, ...)
+    # Plot symbol points if plot.type includes "s".
+    # 
+    if (match("s", plot.types, 0)) {
+      points(xpos, ypos, pch = point.symbols[i], col = point.color[i], ...)
     }
     
     if (show.centroid) {
-      if (match("p", rptype, 0)) {
+      if (match("p", plot.types, 0)) {
         nvertices <- length(xpos)
         
         # first get the "last to first" area component
@@ -233,7 +226,8 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
         }
         points(centroidx / (6 * polygonarea), centroidy / (6 * polygonarea), col = point.color[i], pch = point.symbols[i], cex = 2, ...)
       } else {
-        points(mean(xpos), mean(ypos), col = pointcol, pch = pointsymbols, cex = 2, ...)
+        # points(mean(xpos), mean(ypos), col = pointcol, pch = pointsymbols, cex = 2, ...)
+        points(mean(xpos), mean(ypos), col = point.color[i], pch = point.symbols[i], cex = 2, ...)
       }
     }
   }
