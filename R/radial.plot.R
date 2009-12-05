@@ -35,7 +35,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             show.labels = TRUE, labels = NULL, horizontal.labels = FALSE, label.shift = 1.1,
                             show.radial.grid = TRUE, radial.grid.angles = NULL, 
                             show.grid = TRUE, grid.unit = NULL,
-                            show.range.labels = TRUE, range.labels = NULL,
+                            show.range.labels = TRUE, range.labels = NULL, radial.range.labels = FALSE, horizontal.range.labels = TRUE,
                             point.symbols = NULL, point.color = NULL,
                             show.centroid = FALSE,
                             polygon.color = NULL, ...) { 
@@ -279,13 +279,30 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   # Print the range labels.
   # 
   if (show.range.labels) {
-    range.labels.y <- rep(-grid.max / 15, length(grid.range))
     
     if (is.null(range.labels)) {
       range.labels = as.character(grid.range)
     }
     
-    text(grid.range - range[1], range.labels.y, range.labels, cex = par("cex.lab"))
+    show(range.labels)
+    
+    if (!radial.range.labels) {
+      range.labels.y <- rep(-grid.max / 15, length(grid.range))
+      text(grid.range - range[1], range.labels.y, range.labels, cex = par("cex.lab"))
+    } else {
+      if (horizontal.range.labels) {
+        label.rotation <- 1
+      } else {
+        label.rotation <- ((180 * radial.grid.angles[1]) / pi) + (180 * ((radial.grid.angles[1] > (pi / 2)) && (radial.grid.angles[1] < (3 * pi / 2))))
+      }
+      
+      for(label in 1:length(range.labels)) {
+        range.label.x <- cos(radial.grid.angles[1]) * (grid.range[label] - range[1])
+        range.label.y <- sin(radial.grid.angles[1]) * (grid.range[label] - range[1])
+        
+        text(range.label.x, range.label.y, range.labels[label], cex = par("cex.lab"), srt = label.rotation)
+      }
+    }
   }
   
   # Print the grid unit.
