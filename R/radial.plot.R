@@ -19,7 +19,6 @@ hpm.radial.sun.plot <- function(data.values, data.angles = NULL,
 }
 
 # TODO:
-# - Straighten out the grid displaying situation.
 # - Allow for printing range labels other than horizontally.
 # - Deal better with margins.
 # - Check the circularity of the plot.
@@ -29,20 +28,23 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             margins = c(2, 2, 3, 2),
                             start = (pi / 2), clockwise = TRUE,
                             range = NULL, exact.range = TRUE,
-                            labels = NA, label.angles = NULL, horizontal.labels = FALSE, label.shift = 1.1,
                             line.color = par("fg"), lty = par("lty"), lwd = par("lwd"),
-                            show.grid = TRUE, show.radial.grid = TRUE, grid.unit = NULL,
-                            show.range.labels = TRUE, range.labels = NULL,
                             grid.color= gray(0.9), grid.background = "transparent",
+                            show.labels = TRUE, labels = NULL, horizontal.labels = FALSE, label.shift = 1.1,
+                            show.radial.grid = TRUE, radial.grid.angles = NULL, 
+                            show.grid = TRUE, grid.unit = NULL,
+                            show.range.labels = TRUE, range.labels = NULL,
                             point.symbols = NULL, point.color = NULL,
                             show.centroid = FALSE,
-                            polygon.color = NULL, ...) {
- 
+                            polygon.color = NULL, ...) { 
+  
+  # Generate the range.
+  # 
   if (is.null(range)) {
     range <- range(data.values)
   }
   
-  # Check the dimensions of the data, and make sure they're stored as a matrix.
+  # Check the dimensions of the data, and store it as a matrix.
   # 
   data.dimensions <- dim(data.values)
   if (is.null(data.dimensions)) {
@@ -66,24 +68,24 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   # 
   # data.values[data.values < 0] <- NA
   
-  # If no labels have been provided, generate them based on the data.
+  # Generate labels based on the data.
   # 
-  if (is.na(labels[1])) {
-    label.angles <- seq(0, (2 * pi) - ((2 * pi) / 10), length.out = 9)
-    labels <- as.character(round(label.angles, 2))
+  if (is.null(labels[1])) {
+    radial.grid.angles <- seq(0, (2 * pi) - ((2 * pi) / 10), length.out = 9)
+    labels <- as.character(round(radial.grid.angles, 2))
   }
   
-  # If no angles were provided, generate them based on the data.
+  # Generate data and radial grid angles based on the data.
   # 
   if (is.null(data.angles[1])) {
     data.angles <- seq(0, (2 * pi) - ((2 * pi) / (data.length + 1)), length.out = data.length)
   }
-  if (is.null(label.angles[1])) {
+  if (is.null(radial.grid.angles[1])) {
     label.length <- length(labels)
-    label.angles <- seq(0, (2 * pi) - ((2 * pi) / label.length), length.out = label.length)
+    radial.grid.angles <- seq(0, (2 * pi) - ((2 * pi) / label.length), length.out = label.length)
   }
   
-  # Check the dimensions of the data angles, and make sure they're stored as a matrix.
+  # Check the dimensions of the data angles, and store them as a matrix.
   # 
   data.angles.dimensions <- dim(data.angles)
   if (is.null(data.angles.dimensions)) {
@@ -92,18 +94,18 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     data.angles <- as.matrix(data.angles)
   }
   
-  # If we're plotting in a clockwise direction, invert the angles.
+  # Invert the angles to go clockwise.
   # 
   if (clockwise) {
     data.angles <- -data.angles
-    label.angles <- -label.angles
+    radial.grid.angles <- -radial.grid.angles
   }
   
-  # If we have a start position, adjust for it.
+  # Adjust for the start position.
   # 
-  if(start) {
+  if (start) {
     data.angles <- data.angles + start
-    label.angles <- label.angles + start
+    radial.grid.angles <- radial.grid.angles + start
   }
   
   # Set up the grid.
@@ -178,14 +180,11 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     lwd <- rep(lwd, length.out = data.set.count)
   }
   
-  # Get the vectors of the x and y positions of the radial grid lines.
-  # 
-  radial.grid.x <- cos(label.angles) * grid.max
-  radial.grid.y <- sin(label.angles) * grid.max
-  
   # Plot the radial grid.
   # 
   if (show.radial.grid) {
+    radial.grid.x <- cos(radial.grid.angles) * grid.max
+    radial.grid.y <- sin(radial.grid.angles) * grid.max
     segments(0, 0, radial.grid.x, radial.grid.y, col = grid.color)
   }
   
@@ -259,17 +258,15 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     }
   }
   
-  # Get the vectors of the x and y positions of the labels.
+  # Print the radial grid labels.
   # 
-  label.x <- cos(label.angles) * grid.max * label.shift
-  label.y <- sin(label.angles) * grid.max * label.shift
-  
-  # Print the grid labels.
-  # 
-  if (labels[1] != "") {
+  if (show.labels) {
+    label.x <- cos(radial.grid.angles) * grid.max * label.shift
+    label.y <- sin(radial.grid.angles) * grid.max * label.shift
+    
     if (!horizontal.labels) {
       for(label in 1:length(labels)) {
-        label.rotation <- ((180 * label.angles[label]) / pi) + (180 * ((label.angles[label] > (pi / 2)) && (label.angles[label] < (3 * pi / 2))))
+        label.rotation <- ((180 * radial.grid.angles[label]) / pi) + (180 * ((radial.grid.angles[label] > (pi / 2)) && (radial.grid.angles[label] < (3 * pi / 2))))
         text(label.x[label], label.y[label], labels[label], cex = par("cex.axis"), srt = label.rotation)
       }
     } else {
@@ -277,7 +274,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     }
   }
   
-  # Print the radial grid labels.
+  # Print the range labels.
   # 
   if (show.range.labels) {
     range.labels.y <- rep(-grid.max / 15, length(grid.range))
@@ -289,7 +286,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     text(grid.range - range[1], range.labels.y, range.labels, cex = par("cex.lab"))
   }
   
-  # If there's a grid unit, print it.
+  # Print the grid unit.
   # 
   if (!is.null(grid.unit)) {
     text(grid.max * 1.05, ypos, grid.unit, adj = 0)
