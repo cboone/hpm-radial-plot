@@ -22,6 +22,7 @@ hpm.radial.sun.plot <- function(data.values, data.angles = NULL,
 # - Straighten out the grid displaying situation.
 # - Allow for printing range labels other than horizontally.
 # - Deal better with margins.
+# - Check the circularity of the plot.
 # 
 hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             main = "", xlab = "", ylab = "",
@@ -41,7 +42,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     range <- range(data.values)
   }
   
-  # Check the dimensions of the data, and make sure it's stored as a matrix.
+  # Check the dimensions of the data, and make sure they're stored as a matrix.
   # 
   data.dimensions <- dim(data.values)
   if (is.null(data.dimensions)) {
@@ -57,7 +58,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     data.values <- as.matrix(data.values)
   }
   
-  # Shift toward zero.
+  # Shift the data toward zero.
   # 
   data.values <- data.values - range[1]
   
@@ -65,29 +66,48 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   # 
   # data.values[data.values < 0] <- NA
   
+  # If no labels have been provided, generate them based on the data.
+  # 
+  if (is.na(labels[1])) {
+    label.angles <- seq(0, (2 * pi) - ((2 * pi) / 10), length.out = 9)
+    labels <- as.character(round(label.angles, 2))
+  }
+  
   # If no angles were provided, generate them based on the data.
   # 
   if (is.null(data.angles[1])) {
     data.angles <- seq(0, (2 * pi) - ((2 * pi) / (data.length + 1)), length.out = data.length)
   }
-   
+  if (is.null(label.angles[1])) {
+    label.length <- length(labels)
+    label.angles <- seq(0, (2 * pi) - ((2 * pi) / label.length), length.out = label.length)
+  }
+  
+  # Check the dimensions of the data angles, and make sure they're stored as a matrix.
+  # 
   data.angles.dimensions <- dim(data.angles)
   if (is.null(data.angles.dimensions)) {
-    # 
-    # If the angles are not already a matrix, generate one of the proper size.
-    # 
     data.angles <- matrix(rep(data.angles, data.set.count), nrow = data.set.count, byrow = TRUE)
   } else {
     data.angles <- as.matrix(data.angles)
   }
   
+  # If we're plotting in a clockwise direction, invert the angles.
+  # 
   if (clockwise) {
     data.angles <- -data.angles
-  }
-  if (start) {
-    data.angles <- data.angles + start
+    label.angles <- -label.angles
   }
   
+  # If we have a start position, adjust for it.
+  # 
+  if(start) {
+    data.angles <- data.angles + start
+    label.angles <- label.angles + start
+  }
+  
+  # Set up the grid.
+  # 
   if (show.grid) {
     if (length(range) < 3) {
       grid.range <- pretty(range)
@@ -124,6 +144,8 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   # 
   plot(c(-grid.max, grid.max), c(-grid.max, grid.max), type = "n", axes = FALSE, main = main, xlab = xlab, ylab = ylab)
   
+  # Plot the grid.
+  # 
   if (show.grid) {
     for (i in 1:length(grid.range)) {
       grid.x <- cos(grid.angles) * (grid.range[i] - range[1])
@@ -131,10 +153,6 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
       polygon(grid.x, grid.y, border = grid.color, col = grid.background)
     }
   }
-  
-  # Let's deal with clipping elsewhere.
-  # 
-  # par(xpd=TRUE)
   
   # Make sure that plot attributes are as comprehensive as need be.
   # 
@@ -160,36 +178,16 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     lwd <- rep(lwd, length.out = data.set.count)
   }
   
-  # If no labels have been provided, generate them based on the data.
-  # 
-  if (is.na(labels[1])) {
-    label.angles <- seq(0, (2 * pi) - ((2 * pi) / 10), length.out = 9)
-    labels <- as.character(round(label.angles, 2))
-  }
-  
-  # If no label angles have been provided, generate them based on the data.
-  # 
-  if (is.null(label.angles[1])) {
-    label.length <- length(labels)
-    label.angles <- seq(0, (2 * pi) - ((2 * pi) / label.length), length.out = label.length)
-  }
-  
-  if (clockwise) {
-    label.angles <- -label.angles
-  }
-  if(start) {
-    label.angles <- label.angles + start
-  }
-  
   # Get the vectors of the x and y positions of the radial grid lines.
   # 
   radial.grid.x <- cos(label.angles) * grid.max
   radial.grid.y <- sin(label.angles) * grid.max
   
+  # Plot the radial grid.
+  # 
   if (show.radial.grid) {
     segments(0, 0, radial.grid.x, radial.grid.y, col = grid.color)
   }
-  
   
   # Plot the data.
   # 
@@ -271,7 +269,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   if (labels[1] != "") {
     if (!horizontal.labels) {
       for(label in 1:length(labels)) {
-        label.rotation <- ((180 * label.angles[label]) / pi) + (180 * (label.angles[label] > (pi / 2) && label.angles[label] < (3 * pi / 2)))
+        label.rotation <- ((180 * label.angles[label]) / pi) + (180 * ((label.angles[label] > (pi / 2)) && (label.angles[label] < (3 * pi / 2))))
         text(label.x[label], label.y[label], labels[label], cex = par("cex.axis"), srt = label.rotation)
       }
     } else {
@@ -291,6 +289,8 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     text(grid.range - range[1], range.labels.y, range.labels, cex = par("cex.lab"))
   }
   
+  # If there's a grid unit, print it.
+  # 
   if (!is.null(grid.unit)) {
     text(grid.max * 1.05, ypos, grid.unit, adj = 0)
   }
