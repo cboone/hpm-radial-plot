@@ -3,18 +3,20 @@
 hpm.radial.sun.plot <- function(data.values, data.angles = NULL,
                          margins = c(7, 7.75, 8, 7.25),
                          start = ((pi / 2) - (pi / 6)),
-                         range = 0:1,
+                         range = 0:1, exact.range = TRUE,
                          labels = "",
                          line.color = gray(0.9), lwd = 4,
                          show.grid = FALSE, show.radial.grid = FALSE,
                          show.range.labels = FALSE, ...) {
+  
   hpm.radial.plot(data.values, data.angles,
                   margins = margins,
                   start = start,
-                  range = range,
-                  labels = labels,
+                  range = range, exact.range = exact.range,
                   line.color = line.color, lwd = lwd,
-                  show.grid = show.grid, show.radial.grid = show.radial.grid,
+                  labels = labels,
+                  show.radial.grid = show.radial.grid,
+                  show.grid = show.grid,
                   show.range.labels = show.range.labels, ...)
 }
 
