@@ -21,7 +21,6 @@ hpm.radial.sun.plot <- function(data.values, data.angles = NULL,
 }
 
 # TODO:
-# - Allow for printing range labels other than horizontally.
 # - Deal better with margins.
 # - Check the circularity of the plot.
 # 
