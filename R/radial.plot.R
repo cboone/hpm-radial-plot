@@ -21,7 +21,6 @@ hpm.radial.sun.plot <- function(data.values, data.angles = NULL,
 }
 
 # TODO:
-# - Deal better with margins.
 # - Check the circularity of the plot.
 # 
 hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
