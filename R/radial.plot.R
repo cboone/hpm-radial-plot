@@ -1,39 +1,13 @@
-# Special defaults for plotting sun data. More data, less ink.
-# 
-hpm.radial.sun.plot <- function(data.values, data.angles = NULL,
-                         margins = c(7, 7.75, 8, 7.25),
-                         start = ((pi / 2) - (pi / 6)),
-                         range = 0:1, exact.range = TRUE,
-                         labels = "",
-                         line.color = gray(0.9), lwd = 4,
-                         show.grid = FALSE, show.radial.grid = FALSE,
-                         show.range.labels = FALSE, ...) {
-  
-  hpm.radial.plot(data.values, data.angles,
-                  margins = margins,
-                  start = start,
-                  range = range, exact.range = exact.range,
-                  line.color = line.color, lwd = lwd,
-                  labels = labels,
-                  show.radial.grid = show.radial.grid,
-                  show.grid = show.grid,
-                  show.range.labels = show.range.labels, ...)
-}
-
-# TODO:
-# - Check the circularity of the plot.
-# 
 hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             main = "", xlab = "", ylab = "",
-                            margins = c(2, 2, 3, 2),
+                            margins = c(4, 4, 4, 4),
                             start = (pi / 2), clockwise = TRUE,
                             range = NULL, exact.range = TRUE,
                             line.color = par("fg"), lty = par("lty"), lwd = par("lwd"),
                             grid.color= gray(0.9), grid.background = "transparent",
-                            show.labels = TRUE, labels = NULL, horizontal.labels = FALSE, label.shift = 1.1,
-                            show.radial.grid = TRUE, radial.grid.angles = NULL, 
-                            show.grid = TRUE, grid.unit = NULL,
-                            show.range.labels = TRUE, range.labels = NULL, radial.range.labels = FALSE, horizontal.range.labels = TRUE,
+                            show.labels = TRUE, labels = NULL, horizontal.labels = FALSE, label.shift = 1.1, label.color = gray(0.2),
+                            show.grid = TRUE, show.radial.grid = TRUE, radial.grid.angles = NULL,
+                            show.range.labels = TRUE, range.labels = NULL, radial.range.labels = FALSE, horizontal.range.labels = TRUE, range.label.color = gray(0.2),
                             point.symbols = NULL, point.color = NULL,
                             show.centroid = FALSE,
                             polygon.color = NULL, ...) { 
@@ -137,10 +111,10 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     grid.max <- diff(range)
   }
   
-  # The plot needs to be square, and let's not clip..
+  # The plot needs to be square, and the labels should be left aligned, and let's not clip..
   # 
   oldpar <- par(no.readonly = TRUE)
-  par(mar = margins, pty = "s", xpd = TRUE)
+  par(mar = margins, pty = "s", xpd = TRUE, adj = 0)
   
   # Set up the plotting area.
   # 
@@ -267,7 +241,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     if (!horizontal.labels) {
       for(label in 1:length(labels)) {
         label.rotation <- ((180 * radial.grid.angles[label]) / pi) + (180 * ((radial.grid.angles[label] > (pi / 2)) && (radial.grid.angles[label] < (3 * pi / 2))))
-        text(label.x[label], label.y[label], labels[label], cex = par("cex.axis"), srt = label.rotation)
+        text(label.x[label], label.y[label], labels[label], cex = par("cex.axis"), srt = label.rotation, col = label.color)
       }
     } else {
       text(label.x, label.y, labels, cex = par("cex.axis"))
@@ -286,7 +260,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     
     if (!radial.range.labels) {
       range.labels.y <- rep(-grid.max / 15, length(grid.range))
-      text(grid.range - range[1], range.labels.y, range.labels, cex = par("cex.lab"))
+      text(grid.range - range[1], range.labels.y, range.labels, cex = par("cex.lab"), col = range.label.color)
     } else {
       if (horizontal.range.labels) {
         label.rotation <- 1
@@ -298,15 +272,9 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
         range.label.x <- cos(radial.grid.angles[1]) * (grid.range[label] - range[1])
         range.label.y <- sin(radial.grid.angles[1]) * (grid.range[label] - range[1])
         
-        text(range.label.x, range.label.y, range.labels[label], cex = par("cex.lab"), srt = label.rotation)
+        text(range.label.x, range.label.y, range.labels[label], cex = par("cex.lab"), srt = label.rotation, col = range.label.color)
       }
     }
-  }
-  
-  # Print the grid unit.
-  # 
-  if (!is.null(grid.unit)) {
-    text(grid.max * 1.05, ypos, grid.unit, adj = 0)
   }
   
   # Restore the old settings.
