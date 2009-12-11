@@ -10,7 +10,8 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             show.range.labels = TRUE, range.labels = NULL, radial.range.labels = FALSE, horizontal.range.labels = TRUE, range.label.color = gray(0.2),
                             point.symbols = NULL, point.color = NULL,
                             show.centroid = FALSE,
-                            polygon.color = NULL, ...) { 
+                            polygon.color = NULL,
+                            par.new = FALSE, ...) { 
   
   # Generate the range.
   # 
@@ -280,4 +281,5 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   # Restore the old settings.
   # 
   par(oldpar)
+  par(new = par.new)
 }
