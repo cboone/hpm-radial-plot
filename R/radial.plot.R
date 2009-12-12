@@ -1,6 +1,5 @@
 hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
                             main = "", xlab = "", ylab = "",
-                            margins = c(4, 4, 4, 4),
                             start = (pi / 2), clockwise = TRUE,
                             range = NULL, exact.range = TRUE,
                             line.color = par("fg"), lty = par("lty"), lwd = par("lwd"),
@@ -112,10 +111,8 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     grid.max <- diff(range)
   }
   
-  # The plot needs to be square, and the labels should be left aligned, and let's not clip..
+  # The plot needs to be square.
   # 
-  # par(mar = margins, pty = "s", xpd = TRUE, adj = 0)
-  # par(pty = "s", xpd = TRUE)
   par(pty = "s")
   
   # Set up the plotting area.
