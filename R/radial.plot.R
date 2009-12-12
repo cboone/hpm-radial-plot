@@ -114,8 +114,9 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
   
   # The plot needs to be square, and the labels should be left aligned, and let's not clip..
   # 
-  oldpar <- par(no.readonly = TRUE)
-  par(mar = margins, pty = "s", xpd = TRUE, adj = 0)
+  # par(mar = margins, pty = "s", xpd = TRUE, adj = 0)
+  # par(pty = "s", xpd = TRUE)
+  par(pty = "s")
   
   # Set up the plotting area.
   # 
@@ -190,7 +191,7 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     # Plot radial lines if plot.type includes "r".
     # 
     if (match("r", plot.types, 0)) {
-      segments(0, 0, data.x, data.y, col = line.color[i], lty = lty[i], lwd = lwd[i],...)
+      segments(0, 0, data.x, data.y, col = line.color[i], lty = lty[i], lwd = lwd[i], ...)
     }
     
     # Plot a polygon if plot.type includes "p".
@@ -242,10 +243,10 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     if (!horizontal.labels) {
       for(label in 1:length(labels)) {
         label.rotation <- ((180 * radial.grid.angles[label]) / pi) + (180 * ((radial.grid.angles[label] > (pi / 2)) && (radial.grid.angles[label] < (3 * pi / 2))))
-        text(label.x[label], label.y[label], labels[label], cex = par("cex.axis"), srt = label.rotation, col = label.color)
+        text(label.x[label], label.y[label], labels[label], cex = par("cex.axis"), srt = label.rotation, col = label.color, adj = 0)
       }
     } else {
-      text(label.x, label.y, labels, cex = par("cex.axis"))
+      text(label.x, label.y, labels, cex = par("cex.axis"), adj = 0)
     }
   }
   
@@ -278,8 +279,5 @@ hpm.radial.plot <- function(data.values, data.angles = NULL, plot.type = "p",
     }
   }
   
-  # Restore the old settings.
-  # 
-  par(oldpar)
   par(new = par.new)
 }
